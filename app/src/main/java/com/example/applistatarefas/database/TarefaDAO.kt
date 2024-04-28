@@ -31,11 +31,40 @@ class TarefaDAO(context: Context) : ITarefaDAO {
     }
 
     override fun atualizar(tarefa: Tarefa): Boolean {
-        TODO("Not yet implemented")
+        val args = arrayOf(tarefa.idTarefa.toString())
+        val conteudo = ContentValues()
+        conteudo.put("${DatabaseHelper.DESCRICAO}", tarefa.descricao)
+        try {
+            escrita.update(
+                DatabaseHelper.NOME_TABELA_TAREFAS,
+                conteudo,
+                "${DatabaseHelper.ID_TAREFA} = ?",
+                args
+            )
+            Log.i("info_db", "Sucesso ao atualizar tarefa")
+        }catch (e:Exception){
+            e.printStackTrace()
+            Log.i("info_db", "Erro ao atualizar tarefa")
+            return false
+        }
+        return true
     }
 
     override fun remover(idTarefa: Int): Boolean {
-        TODO("Not yet implemented")
+        val args = arrayOf(idTarefa.toString())
+        try {
+            escrita.delete(
+                DatabaseHelper.NOME_TABELA_TAREFAS,
+                "${DatabaseHelper.ID_TAREFA} = ?",
+                args
+            )
+            Log.i("info_db", "Sucesso ao remover tarefa")
+        }catch (e:Exception){
+            e.printStackTrace()
+            Log.i("info_db", "Erro ao remover tarefa")
+            return false
+        }
+        return true
     }
 
     override fun listar(): List<Tarefa> {
@@ -43,7 +72,8 @@ class TarefaDAO(context: Context) : ITarefaDAO {
         val listaTarefas = mutableListOf<Tarefa>()
         val sql = "SELECT ${DatabaseHelper.ID_TAREFA}, " +
                 "${DatabaseHelper.DESCRICAO}," +
-                "strftime('%d/%m/%Y %H:%M', ${DatabaseHelper.DATA_CRIACAO}) AS ${DatabaseHelper.DATA_CRIACAO} " +
+                "strftime('%d/%m/%Y %H:%M', ${DatabaseHelper.DATA_CRIACAO}) AS " +
+                "${DatabaseHelper.DATA_CRIACAO} " +
                 "FROM ${DatabaseHelper.NOME_TABELA_TAREFAS}"
 
         val cursor = leitura.rawQuery(sql, null)
